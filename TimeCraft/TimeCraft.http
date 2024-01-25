@@ -1,6 +1,0 @@
-@TimeCraft_HostAddress = http://localhost:5038
-
-GET {{TimeCraft_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
