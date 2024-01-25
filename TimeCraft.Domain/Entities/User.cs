@@ -8,7 +8,6 @@
         public DateTime Birthday { get; set; }
         public string Address { get; set; }
         public string UserName { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
         public string Email { get; set; }
         public string Role { get; set; }
     }

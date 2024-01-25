@@ -14,4 +14,8 @@
     <ProjectReference Include="..\TimeCraft.Core\TimeCraft.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistence\Migrations\" />
+  </ItemGroup>
+
 </Project>
