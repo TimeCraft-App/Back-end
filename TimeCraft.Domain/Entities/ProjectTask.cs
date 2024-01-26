@@ -7,22 +7,23 @@ using System.Threading.Tasks;
 
 namespace TimeCraft.Domain.Entities
 {
-    public class Project : BaseEntity
+    public class ProjectTask : BaseEntity
     {
+        public int ProjectId { get; set; }
+
+        public Project? Project { get; set; }
         public string Name { get; set; }
 
-        public string Department { get; set; } // DepartmentType enum
+        public string Description { get; set; }
 
         [ForeignKey("EmployeeId")]
-        public int? ManagerId { get; set; }
+        public int AssignedToEmployee {  get; set; }
 
-        public Employee? Manager { get; set; }
+        public string Status {  get; set; } //task enum
 
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
-
-        public virtual List<ProjectTask> ProjectTasks { get; set; } = new List<ProjectTask>();
 
         public virtual List<TimeWorked> TimeWorked { get; set; } = new List<TimeWorked>();
 
