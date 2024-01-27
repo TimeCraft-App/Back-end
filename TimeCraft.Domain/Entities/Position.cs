@@ -13,6 +13,5 @@ namespace TimeCraft.Domain.Entities
         public string Description { get; set; }
     
         public string ContractConditions { get; set; }  
-
     }
 }

@@ -16,15 +16,15 @@ namespace TimeCraft.Domain.Entities
         [ForeignKey("EmployeeId")]
         public int? ManagerId { get; set; }
 
-        public Employee? Manager { get; set; }
+        public Employee Manager { get; set; }
 
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
 
-        public virtual List<ProjectTask> ProjectTasks { get; set; } = new List<ProjectTask>();
+        public virtual ICollection<ProjectTask> ProjectTasks { get; set; } = new List<ProjectTask>();
 
-        public virtual List<TimeWorked> TimeWorked { get; set; } = new List<TimeWorked>();
+        public virtual ICollection<TimeWorked> TimeWorked { get; set; } = new List<TimeWorked>();
 
     }
 }

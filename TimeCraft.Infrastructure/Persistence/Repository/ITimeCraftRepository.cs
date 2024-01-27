@@ -5,7 +5,7 @@ namespace TimeCraft.Infrastructure.Persistence.Repository
     public interface ITimeCraftRepository<TEntity> where TEntity : class
     {
         IQueryable<TEntity> GetByCondition(Expression<Func<TEntity, bool>> expression, bool asNoTracking = false, params string[] includes);
-        IQueryable<TEntity> GetByConditionPaginated(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, object>> orderBy, int page, int pageSize, bool orderByDescending = true);
+        IQueryable<TEntity> GetByConditionPaginated(Expression<Func<TEntity, bool>> expression, int page, int pageSize);
         IQueryable<TEntity> GetAll();
         IQueryable<TEntity> GetById(Expression<Func<TEntity, bool>> expression);
 
