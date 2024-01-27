@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using TimeCraft.Infrastructure.Constants;
 using TimeCraft.Infrastructure.Persistence.Data;
 
 namespace TimeCraft.Infrastructure.Persistence.Repository
@@ -29,9 +30,9 @@ namespace TimeCraft.Infrastructure.Persistence.Repository
             return queryable;
         }
 
-        public IQueryable<TEntity> GetByConditionPaginated(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, object>> orderBy, int page, int pageSize, bool orderByDescending = true)
+        public IQueryable<TEntity> GetByConditionPaginated(Expression<Func<TEntity, bool>> expression, int page, int pageSize)
         {
-            const int defaultPageNumber = 1;
+            const int defaultPageNumber = CommonConstants.DefaultPageNumber;
 
             var query = _dbContext.Set<TEntity>().Where(expression);
 
@@ -39,11 +40,6 @@ namespace TimeCraft.Infrastructure.Persistence.Repository
             if (page <= 0)
             {
                 page = defaultPageNumber;
-            }
-
-            if (orderBy != null)
-            {
-                query = orderByDescending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
             }
 
             return query.Skip((page - 1) * pageSize).Take(pageSize);

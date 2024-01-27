@@ -1,15 +1,17 @@
-﻿using TimeCraft.Core.Constants;
+﻿using TimeCraft.Infrastructure.Constants;
 
 namespace TimeCraft.Core.Services
 {
-    internal interface ICrudOperations<T>
+    public interface ICrudOperations<T>
     {
         Task<IEnumerable<T>> GetAllAsync(int page = 1, int pageSize = CommonConstants.DefaultPageSize);
 
-        Task<IEnumerable<T>> GetAsync(int id); 
+        Task<T> GetById(int id); 
 
-        Task<int> Create(T entity);
+        Task<int> Create(T entityToCreate);
 
-        Task Delete(int id);
+        Task Update(T entityToUpdate);
+
+        Task Delete(int id, bool softDelete = true);
     }
 }

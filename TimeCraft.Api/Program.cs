@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using TimeCraft.Infrastructure.Persistence.Data;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 using TimeCraft.Infrastructure.Configurations;
-
+using TimeCraft.Infrastructure.Persistence.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -17,6 +17,15 @@ services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+#region [Serilog]
+var logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .Enrich.FromLogContext()
+        .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+#endregion
 
 #region [Mapper]
 var mapperConfiguration = new MapperConfiguration(
