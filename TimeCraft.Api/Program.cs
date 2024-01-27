@@ -1,17 +1,30 @@
 using Microsoft.EntityFrameworkCore;
 using TimeCraft.Infrastructure.Persistence.Data;
+using AutoMapper;
+using TimeCraft.Infrastructure.Configurations;
+
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
-builder.Services.AddControllers();
+services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DataContext>(options =>
+services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+
+#region [Mapper]
+var mapperConfiguration = new MapperConfiguration(
+    mc => mc.AddProfile(new AutoMapperConfigurations()));
+
+IMapper mapper = mapperConfiguration.CreateMapper();
+services.AddSingleton(mapper);
+#endregion
 
 var app = builder.Build();
 
