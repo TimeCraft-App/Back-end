@@ -25,7 +25,7 @@ namespace TimeCraft.Domain.Entities
 
         public DateTime EndDate { get; set; }
 
-        public virtual List<TimeWorked> TimeWorked { get; set; } = new List<TimeWorked>();
+        public virtual ICollection<TimeWorked> TimeWorked { get; set; } = new List<TimeWorked>();
 
     }
 }

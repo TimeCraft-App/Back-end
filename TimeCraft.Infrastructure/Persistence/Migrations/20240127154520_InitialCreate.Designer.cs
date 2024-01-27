@@ -12,8 +12,8 @@ using TimeCraft.Infrastructure.Persistence.Data;
 namespace TimeCraft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240126222617_Entities")]
-    partial class Entities
+    [Migration("20240127154520_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,10 +48,7 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -60,7 +57,7 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("SalaryId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Employees");
                 });
@@ -451,7 +448,7 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
 
                     b.HasOne("TimeCraft.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Position");
 
@@ -506,7 +503,7 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
                     b.HasOne("TimeCraft.Domain.Entities.Project", "Project")
                         .WithMany("TimeWorked")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TimeCraft.Domain.Entities.ProjectTask", "ProjectTask")
