@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\" />
+    <Folder Include="Dtos\UserDtos\" />
   </ItemGroup>
 
 </Project>

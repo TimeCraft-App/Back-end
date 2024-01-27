@@ -15,6 +15,6 @@ namespace TimeCraft.Domain.Entities
         public string ContractType { get; set; }
 
         public int PositionId { get; set; }
-        public Position? Position { get; set; }
+        public Position Position { get; set; }
     }
 }
