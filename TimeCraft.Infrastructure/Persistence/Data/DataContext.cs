@@ -17,16 +17,21 @@ namespace TimeCraft.Infrastructure.Persistence.Data
         public DbSet<Position> Positions { get; set; }
         public DbSet<Salary> Salaries { get; set; }
         public DbSet<QueuedEmail> QueuedEmails { get; set; }
-        public DbSet<TimeoffBalance> TimeoffBalances{ get; set; }
-        public DbSet<TimeoffRequest> TimeoffRequests{ get; set; }
+        public DbSet<TimeoffBalance> TimeoffBalances { get; set; }
+        public DbSet<TimeoffRequest> TimeoffRequests { get; set; }
         public DbSet<TimeWorked> TimeWorked { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<TimeWorked>()
-                .HasOne(p => p.Project)
-                .WithMany(od => od.TimeWorked).OnDelete(DeleteBehavior.Cascade);
+                .HasOne(tw => tw.Project)
+                .WithMany(p => p.TimeWorked)
+                .HasForeignKey(tw => tw.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

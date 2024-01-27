@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TimeCraft.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Entities : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -52,6 +52,27 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Birthday = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Salaries",
                 columns: table => new
                 {
@@ -82,8 +103,7 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SalaryId = table.Column<int>(type: "int", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
@@ -105,8 +125,8 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
                         principalTable: "Salaries",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Employees_Users_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_Employees_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
@@ -261,7 +281,7 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -275,9 +295,9 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
                 column: "SalaryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_UserId1",
+                name: "IX_Employees_UserId",
                 table: "Employees",
-                column: "UserId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_ManagerId",
@@ -351,6 +371,9 @@ namespace TimeCraft.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Salaries");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Positions");
