@@ -6,7 +6,7 @@ namespace TimeCraft.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class BaseController
+    public class BaseController : Controller
     {
     }
 }
