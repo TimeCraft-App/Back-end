@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TimeCraft.Domain.Entities;
 
-namespace TimeCraft.Domain.Dtos
+namespace TimeCraft.Domain.Dtos.EmployeeDtos
 {
     public class EmployeeCreateDto
     {

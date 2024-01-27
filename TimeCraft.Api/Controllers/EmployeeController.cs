@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeCraft.Core.Services.EmployeeService;
-using TimeCraft.Domain.Dtos;
+using TimeCraft.Domain.Dtos.EmployeeDtos;
 using TimeCraft.Domain.Entities;
 using TimeCraft.Infrastructure.Constants;
 

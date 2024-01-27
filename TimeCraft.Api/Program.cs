@@ -1,8 +1,11 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using TimeCraft.Api.Extensions;
 using TimeCraft.Infrastructure.Configurations;
 using TimeCraft.Infrastructure.Persistence.Data;
+using TimeCraft.Infrastructure.Persistence.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -12,10 +15,14 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
+services.RegisterServices();
+
 services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 #region [Serilog]
 var logger = new LoggerConfiguration()
@@ -33,7 +40,7 @@ var mapperConfiguration = new MapperConfiguration(
 
 IMapper mapper = mapperConfiguration.CreateMapper();
 services.AddSingleton(mapper);
-#endregion
+#endregion  
 
 var app = builder.Build();
 
@@ -49,7 +56,7 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.DocExpansion(DocExpansion.None));
 }
 
 app.UseHttpsRedirection();
