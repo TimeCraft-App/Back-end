@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TimeCraft.Core.Services.PositionService;
 using TimeCraft.Domain.Dtos.PositionDtos;
@@ -72,6 +74,7 @@ namespace TimeCraft.Api.Controllers
         /// </summary>
         /// <param name="positionToCreate"></param>
         /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost("position")]
         public async Task<IActionResult> CreatePosition(PositionCreateDto positionToCreate)
         {

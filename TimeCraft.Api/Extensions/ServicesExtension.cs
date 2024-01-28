@@ -1,6 +1,7 @@
 ﻿using TimeCraft.Core.Services.EmployeeService;
 using TimeCraft.Core.Services.PositionService;
 using TimeCraft.Core.Services.SalaryService;
+using TimeCraft.Core.Services.UserService;
 using TimeCraft.Domain.Entities;
 
 namespace TimeCraft.Api.Extensions
@@ -12,6 +13,7 @@ namespace TimeCraft.Api.Extensions
             services.AddTransient<IEmployeeService<Employee>, EmployeeService>();
             services.AddTransient<IPositionService<Position>, PositionService>();
             services.AddTransient<ISalaryService<Salary>, SalaryService>();
+            services.AddTransient<IUserService, UserService>();
         }
     }
 }

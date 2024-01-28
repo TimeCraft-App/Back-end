@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
-using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,14 +12,14 @@ using TimeCraft.EmailSender.Dtos;
 
 namespace TimeCraft.EmailSender.Workers
 {
-    public class TimeoffStatusRequestEmailBackgroundService : BackgroundService
+    public class WelcomeUserBackgroundService : BackgroundService
     {
         private IConnection _connection;
         private IModel _channel;
         private readonly IEmailSender _emailSender;
-        private readonly ILogger<TimeoffStatusRequestEmailBackgroundService> _logger;
+        private readonly ILogger<WelcomeUserBackgroundService> _logger;
 
-        public TimeoffStatusRequestEmailBackgroundService(IEmailSender emailSender, ILogger<TimeoffStatusRequestEmailBackgroundService> logger)
+        public WelcomeUserBackgroundService(IEmailSender emailSender, ILogger<WelcomeUserBackgroundService> logger)
         {
             var factory = new ConnectionFactory() { HostName = "localhost" };
             _connection = factory.CreateConnection();
@@ -31,7 +30,7 @@ namespace TimeCraft.EmailSender.Workers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _channel.QueueDeclare("timeoff-request-status", exclusive: false, durable: true, autoDelete: false, arguments: null);
+            _channel.QueueDeclare("welcome-user", exclusive: false, durable: true, autoDelete: false, arguments: null);
 
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (model, args) =>
@@ -41,12 +40,12 @@ namespace TimeCraft.EmailSender.Workers
 
                 var body = args.Body;
                 var message = Encoding.UTF8.GetString(body.ToArray());
-                var data = JsonConvert.DeserializeObject<TimeoffRequestStatusDto>(message);
+                var data = JsonConvert.DeserializeObject<WelcomeUserDto>(message);
 
                 SendEmail(data).GetAwaiter().GetResult();
             };
 
-            _channel.BasicConsume(queue: "timeoff-request-status",
+            _channel.BasicConsume(queue: "welcome-user",
                                   autoAck: true,
                                   consumer: consumer);
 
@@ -56,37 +55,19 @@ namespace TimeCraft.EmailSender.Workers
             }
         }
 
-        private async Task SendEmail(TimeoffRequestStatusDto data)
+        private async Task SendEmail(WelcomeUserDto data)
         {
-            var pathToFile = "Templates/timeoffRequestStatus.html";
-
-            string htmlBody = "";
-            using (StreamReader streamReader = File.OpenText(pathToFile))
-            {
-                htmlBody = streamReader.ReadToEnd();
-            }
-
-            var contentData = new string[] {
-                data.UserFirstName + data.UserLastName,
-                data.Type,
-                data.StartDate.ToString(),
-                data.EndDate.ToString(),
-                data.Comment,
-                DateTime.Now.ToString()
-            };
-
-            var content = string.Format(htmlBody, contentData);
+            var content = data.Info;
 
             try
             {
-                _logger.LogInformation("Sending 'Timeoff request status' email!");
-
-                // Todo: send to HR department
-                await _emailSender.SendEmailAsync("jetonsllamniku@gmail.com", "Timeoff request status changed", content);
+                _logger.LogInformation("Sending 'Welcome to TimeCraft' email!");
+                
+                await _emailSender.SendEmailAsync(data.Email, "Welcome to TimeCraft!", content);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending email for timeoff request!");
+                _logger.LogError(ex, "Error sending email for welcome to timecraft!");
             }
         }
         public override void Dispose()

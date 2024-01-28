@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TimeCraft.Domain.Entities;
 
 namespace TimeCraft.Infrastructure.Persistence.Data
@@ -20,7 +21,7 @@ namespace TimeCraft.Infrastructure.Persistence.Data
         public DbSet<TimeoffBalance> TimeoffBalances { get; set; }
         public DbSet<TimeoffRequest> TimeoffRequests { get; set; }
         public DbSet<TimeWorked> TimeWorked { get; set; }
-
+        public DbSet<IdentityUser> IdentityUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
