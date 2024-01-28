@@ -20,6 +20,7 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 services.AddHostedService<TimeoffRequestEmailBackgroundService>();
+services.AddHostedService<WelcomeUserBackgroundService>();
 
 #region [Serilog]
 var logger = new LoggerConfiguration()

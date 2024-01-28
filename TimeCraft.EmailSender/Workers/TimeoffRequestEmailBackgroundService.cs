@@ -52,7 +52,7 @@ namespace TimeCraft.EmailSender.Workers
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(100000, stoppingToken);
+                await Task.Delay(30000, stoppingToken);
             }
         }
 

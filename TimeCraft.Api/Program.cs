@@ -2,10 +2,13 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Text;
 using TimeCraft.Api.Extensions;
+using TimeCraft.Core.Helpers;
 using TimeCraft.Infrastructure.Configurations;
 using TimeCraft.Infrastructure.Persistence.Data;
 using TimeCraft.Infrastructure.Persistence.UnitOfWork;
@@ -27,17 +30,18 @@ services.AddDbContext<DataContext>(options =>
 
 services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddSingleton(builder.Configuration);
+builder.Configuration.AddEnvironmentVariables();
+services.AddSingleton(builder.Configuration);
 
+services.Configure<JWTConfiguration>(builder.Configuration.GetSection("JWTConfiguration"));
 
 #region JWT 
-builder.Services.AddDefaultIdentity<IdentityUser>()
+services.AddDefaultIdentity<IdentityUser>()
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<DataContext>();
-// Add JWT authentication
-builder.Services.Configure<JWTConfiguration>(builder.Configuration.GetSection("JWTConfiguration"));
 
-builder.Services.AddAuthentication(options =>
+// Add JWT authentication
+services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,12 +61,9 @@ builder.Services.AddAuthentication(options =>
         RequireExpirationTime = false,
     };
 });
-
-
 #endregion
 
-
-builder.Services.AddSwaggerGen(c =>
+services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -126,7 +127,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.DocExpansion(DocExpansion.None));
 }
 
+app.UseCors(cors => cors.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
