@@ -5,13 +5,17 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementation", "Implementation", "{0461932B-97DB-486B-B990-CB256FDA7D63}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeCraft.Core", "TimeCraft.Core\TimeCraft.Core.csproj", "{01FB90E5-378A-4670-9359-7432387BAD60}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeCraft.Infrastructure", "TimeCraft.Infrastructure\TimeCraft.Infrastructure.csproj", "{6737E0EA-B1A2-423D-89C6-1C0A1931512F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeCraft.Domain", "TimeCraft.Domain\TimeCraft.Domain.csproj", "{72D42C2B-FDAD-4CEF-9C4E-94230C4D07B1}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{1D73701A-00A9-44B6-B613-A7F58B087675}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{BA2ED2AF-22E6-4B21-A292-BE4FED7587D1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeCraft.Api", "TimeCraft.Api\TimeCraft.Api.csproj", "{02F3474C-2B3A-4B0A-A4E0-5D8BF9989A66}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeCraft.EmailSender", "TimeCraft.EmailSender\TimeCraft.EmailSender.csproj", "{E692F7E4-05EA-4A03-A77C-2F4B1B254BD9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeCraft.Api", "TimeCraft.Api\TimeCraft.Api.csproj", "{02F3474C-2B3A-4B0A-A4E0-5D8BF9989A66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,21 +23,31 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01FB90E5-378A-4670-9359-7432387BAD60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01FB90E5-378A-4670-9359-7432387BAD60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01FB90E5-378A-4670-9359-7432387BAD60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01FB90E5-378A-4670-9359-7432387BAD60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6737E0EA-B1A2-423D-89C6-1C0A1931512F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6737E0EA-B1A2-423D-89C6-1C0A1931512F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6737E0EA-B1A2-423D-89C6-1C0A1931512F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6737E0EA-B1A2-423D-89C6-1C0A1931512F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72D42C2B-FDAD-4CEF-9C4E-94230C4D07B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72D42C2B-FDAD-4CEF-9C4E-94230C4D07B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72D42C2B-FDAD-4CEF-9C4E-94230C4D07B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72D42C2B-FDAD-4CEF-9C4E-94230C4D07B1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{02F3474C-2B3A-4B0A-A4E0-5D8BF9989A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{02F3474C-2B3A-4B0A-A4E0-5D8BF9989A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02F3474C-2B3A-4B0A-A4E0-5D8BF9989A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02F3474C-2B3A-4B0A-A4E0-5D8BF9989A66}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E692F7E4-05EA-4A03-A77C-2F4B1B254BD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E692F7E4-05EA-4A03-A77C-2F4B1B254BD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E692F7E4-05EA-4A03-A77C-2F4B1B254BD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E692F7E4-05EA-4A03-A77C-2F4B1B254BD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{01FB90E5-378A-4670-9359-7432387BAD60} = {0461932B-97DB-486B-B990-CB256FDA7D63}
+		{6737E0EA-B1A2-423D-89C6-1C0A1931512F} = {0461932B-97DB-486B-B990-CB256FDA7D63}
+		{72D42C2B-FDAD-4CEF-9C4E-94230C4D07B1} = {0461932B-97DB-486B-B990-CB256FDA7D63}
 		{02F3474C-2B3A-4B0A-A4E0-5D8BF9989A66} = {1D73701A-00A9-44B6-B613-A7F58B087675}
-		{E692F7E4-05EA-4A03-A77C-2F4B1B254BD9} = {BA2ED2AF-22E6-4B21-A292-BE4FED7587D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C8606337-EA6E-4145-9A59-09F5A245A5D5}
