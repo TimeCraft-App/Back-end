@@ -6,7 +6,7 @@ using TimeCraft.Domain.Entities;
 
 namespace TimeCraft.Api.Controllers
 {
-    public class PositionController : BaseController
+    public class PositionController : Controller
     {
         private readonly IPositionService<Position> _positionService;
         private readonly ILogger<PositionController> _logger;

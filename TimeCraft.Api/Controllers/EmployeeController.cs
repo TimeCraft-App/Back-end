@@ -11,7 +11,7 @@ using TimeCraft.Infrastructure.Constants;
 
 namespace TimeCraft.Api.Controllers
 {
-    public class EmployeeController : BaseController
+    public class EmployeeController : Controller
     {
         private readonly IEmployeeService<Employee> _employeeService;
         private readonly ILogger<EmployeeController> _logger;
