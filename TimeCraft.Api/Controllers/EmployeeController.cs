@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.NetworkInformation;
+using System.Text;
 using TimeCraft.Core.Services.EmployeeService;
 using TimeCraft.Domain.Dtos.EmployeeDtos;
 using TimeCraft.Domain.Entities;
@@ -51,6 +54,17 @@ namespace TimeCraft.Api.Controllers
             return Ok(employee);
         }
 
+
+        [HttpGet("Test")]
+        public async Task<IActionResult> SendEmailTest()
+        {
+
+            _employeeService.SendEmailTest("jetonsllamniku@gmail.com", "The timeoff request has been made!");
+            _employeeService.SendEmailTest2("jetonsllamniku@gmail.com", "The timeoff request status has changed!");
+            return Ok("sent");
+        }
+
+        
         /// <summary>
         /// Gets all employees in paginated form
         /// </summary>
