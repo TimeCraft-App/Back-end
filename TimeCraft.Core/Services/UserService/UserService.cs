@@ -128,7 +128,7 @@ namespace TimeCraft.Core.Services.UserService
                 await _unitOfWork.CompleteAsync();
                 var jwtToken = await GenerateTheJWT(newUser);
 
-                PublishRegistrationEvent(userToBeAdded.Email, $"Hey, {userToBeAdded.FirstName}! Welcome To TimeCraft ecommerce store. Hope you enjoy it!");
+                PublishRegistrationEvent(userToBeAdded.Email, $"Hey, {userToBeAdded.FirstName}! Welcome To TimeCraft management application. Hope you enjoy it!");
 
                 return new AuthResult
                 {
