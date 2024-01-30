@@ -8,6 +8,7 @@ using TimeCraft.Domain.Entities;
 
 namespace TimeCraft.Api.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class PositionController : Controller
     {
         private readonly IPositionService<Position> _positionService;
@@ -74,7 +75,6 @@ namespace TimeCraft.Api.Controllers
         /// </summary>
         /// <param name="positionToCreate"></param>
         /// <returns></returns>
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost("position")]
         public async Task<IActionResult> CreatePosition(PositionCreateDto positionToCreate)
         {
@@ -96,6 +96,7 @@ namespace TimeCraft.Api.Controllers
         /// </summary>
         /// <param name="positionToUpdate"></param>
         /// <returns></returns>
+        /// 
         [HttpPut("position")]
         public async Task<IActionResult> UpdatePosition(PositionUpdateDto positionToUpdate)
         {

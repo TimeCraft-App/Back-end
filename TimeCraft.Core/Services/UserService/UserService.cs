@@ -199,6 +199,7 @@ namespace TimeCraft.Core.Services.UserService
                 Audience = "http://localhost:37997"
             };
 
+
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = jwtTokenHandler.WriteToken(token);
 
