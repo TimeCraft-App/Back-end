@@ -10,6 +10,7 @@ using System.Text;
 using TimeCraft.Core.Dtos;
 using TimeCraft.Domain.Dtos.LeaveManagerDtos;
 using TimeCraft.Domain.Entities;
+using TimeCraft.Domain.Enums;
 using TimeCraft.Infrastructure.Persistence.UnitOfWork;
 
 namespace TimeCraft.Core.Services.LeaveManager
@@ -44,7 +45,10 @@ namespace TimeCraft.Core.Services.LeaveManager
             _unitOfWork.Repository<TimeoffRequest>().Create(timeoffRequest);
             await _unitOfWork.CompleteAsync();
 
+            // Send email to user to notify that the application was succesful
             PublishTimeoffRequestForUser(user.FirstName, user.LastName, user.Email, application.StartDate, application.EndDate);
+
+            // Send email to HR to notify that a new timeoff request was made 
             PublishTimeoffRequestForHR(user.FirstName, user.LastName, user.Email, timeoffRequest.Type, application.StartDate, application.EndDate, timeoffRequest.Comment);
 
             return true;
@@ -52,32 +56,58 @@ namespace TimeCraft.Core.Services.LeaveManager
 
         public async Task ApproveTimeoffRequest(int id)
         {
-            var timeoffRequest = await _unitOfWork.Repository<TimeoffRequest>().GetById(x => x.Id == id).FirstOrDefaultAsync();
+            await ApproveOrDenyTimeoffRequest(id, approve: true);
+        }
 
+        public async Task RejectTimeoffRequest(int id)
+        {
+            await ApproveOrDenyTimeoffRequest(id, deny: true);
+        }
+
+        private async Task ApproveOrDenyTimeoffRequest(int id, bool approve = false, bool deny = false)
+        {
+            var timeoffRequest = await _unitOfWork.Repository<TimeoffRequest>().GetById(x => x.Id == id)
+                                                  .Include(x => x.Employee)
+                                                  .ThenInclude(x => x.User).FirstOrDefaultAsync();
+            
             if (timeoffRequest is null)
             {
                 throw new NullReferenceException("The timeoff request doesn't exist!");
             }
 
-            timeoffRequest.Status = "Approved";
+            if (approve && timeoffRequest.Status == TimeoffRequestStatusType.Approved.ToString()) {
+                throw new Exception("The timeoff is already approved!");
+            }
+
+            if (deny && timeoffRequest.Status == TimeoffRequestStatusType.Denied.ToString())
+            {
+                throw new Exception("The timeoff is already denied!");
+            }
+
+            string previousStatus = timeoffRequest.Status;
+            
+            timeoffRequest.Status = approve ? TimeoffRequestStatusType.Approved.ToString() : TimeoffRequestStatusType.Denied.ToString();
             timeoffRequest.UpdatedOn = DateTime.Now;
-
-
 
             _unitOfWork.Repository<TimeoffRequest>().Update(timeoffRequest);
             await _unitOfWork.CompleteAsync();
-        }
 
-        public Task RejectTimeoffRequest(int id)
-        {
-            throw new NotImplementedException();
-        }
+            var data = new TimeoffRequestStatusDto {
+                UserFirstName = timeoffRequest.Employee.User.FirstName,
+                UserLastName = timeoffRequest.Employee.User.LastName,
+                Type = timeoffRequest.Type,
+                Comment = timeoffRequest.Comment,
+                FromStatus = previousStatus,
+                ToStatus = timeoffRequest.Status,
+            };
 
+            PublishTimeoffRequestStatus(data); // Send timeoff request status changed email
+        }
 
         /// <summary>
         /// Publishes the event to the "timeoff-request" queue when a new timeoff-request is made
         /// </summary>
-        public void PublishTimeoffRequestForUser(string name, string lastName, string email, DateTime startDate, DateTime endDate)
+        private void PublishTimeoffRequestForUser(string name, string lastName, string email, DateTime startDate, DateTime endDate)
         {
             var info = $"Hello, {name} {lastName}! \n" +
                 $" The application for timeoffRequest for dates {startDate.ToString("dd/MM/yyyy")}-{endDate.ToString("dd/MM/yyyy")} \n" +
@@ -106,7 +136,7 @@ namespace TimeCraft.Core.Services.LeaveManager
         /// <summary>
         /// Publishes the event to the "timeoff-request" queue when a new timeoff-request is made
         /// </summary>
-        public void PublishTimeoffRequestForHR(string name, string lastName, string email, string type, DateTime startDate, DateTime endDate, string comment)
+        private void PublishTimeoffRequestForHR(string name, string lastName, string email, string type, DateTime startDate, DateTime endDate, string comment)
         {
             var data = new TimeoffRequestHRDto
             {
@@ -138,6 +168,35 @@ namespace TimeCraft.Core.Services.LeaveManager
                 _logger.LogInformation($"{nameof(Employee)} - Data for timeoff-request for HR is published to the rabbit!");
             }
         }
+
+
+        /// <summary>
+        /// Publishes the event to the "timeoff-request" when the timeoff request status is changed
+        /// </summary>
+        /// <param name="rabbitData"></param>
+        private void PublishTimeoffRequestStatus(TimeoffRequestStatusDto data)
+        {
+            var factory = new ConnectionFactory() { HostName = "localhost" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.QueueDeclare(queue: "timeoff-request-status",
+                                     durable: true,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data));
+
+                channel.BasicPublish(exchange: "",
+                                     routingKey: "timeoff-request-status",
+                                     basicProperties: null,
+                                     body: body);
+
+                _logger.LogInformation($"{nameof(Employee)} - Data for timeoff-request-status is published to the rabbit!");
+            }
+        }
+
 
     }
 }

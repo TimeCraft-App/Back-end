@@ -36,5 +36,42 @@ namespace TimeCraft.Api.Controllers
                 return BadRequest("The timeoff request couldn't be made!");
             }
         }
+
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, HR")]
+        [HttpPost("/approve")]
+        public async Task<IActionResult> ApproveTimeoffRequest(int id)
+        {
+            try
+            {
+                await _leaveManagerService.ApproveTimeoffRequest(id);
+
+                _logger.LogInformation($"{nameof(LeaveManagerController)}: The timeoff request with id: {id} status is changed successfully!");
+                return Ok("The timeoff request status is changed successfully!\"");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(LeaveManagerController)}: Sth bad happened during the approval of the timeoff request!");
+                return BadRequest("The timeoff request status didn't change!");
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, HR")]
+        [HttpPost("/reject")]
+        public async Task<IActionResult> RejectTimeoffRequest(int id)
+        {
+            try
+            {
+                await _leaveManagerService.RejectTimeoffRequest(id);
+
+                _logger.LogInformation($"{nameof(LeaveManagerController)}: The timeoff request with id: {id} status is changed successfully!");
+                return Ok("The timeoff request status is changed successfully!\"");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(LeaveManagerController)}: Sth bad happened during the rejection of the timeoff request!");
+                return BadRequest("The timeoff request status didn't change!");
+            }
+        }
     }
 }

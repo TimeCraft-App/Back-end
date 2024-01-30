@@ -67,12 +67,12 @@ namespace TimeCraft.EmailSender.Workers
             }
 
             var contentData = new string[] {
-                data.UserFirstName + data.UserLastName,
+                data.UserFirstName + " " + data.UserLastName,
                 data.Type,
-                data.StartDate.ToString(),
-                data.EndDate.ToString(),
-                data.Comment,
-                DateTime.Now.ToString()
+                data.FromStatus,
+                data.ToStatus,
+                data.Comment ?? "",
+                DateTime.Now.ToString("dd/MM/yyyy")
             };
 
             var content = string.Format(htmlBody, contentData);

@@ -53,17 +53,6 @@ namespace TimeCraft.Api.Controllers
 
             return Ok(employee);
         }
-
-
-        [HttpGet("Test")]
-        public async Task<IActionResult> SendEmailTest()
-        {
-
-            _employeeService.SendEmailTest("jetonsllamniku@gmail.com", "The timeoff request has been made!");
-            _employeeService.SendEmailTest2("jetonsllamniku@gmail.com", "The timeoff request status has changed!");
-            return Ok("sent");
-        }
-
         
         /// <summary>
         /// Gets all employees in paginated form
