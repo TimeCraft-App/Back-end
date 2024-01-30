@@ -13,14 +13,14 @@ using TimeCraft.EmailSender.Dtos;
 
 namespace TimeCraft.EmailSender.Workers
 {
-    public class TimeoffRequestEmailBackgroundService : BackgroundService
+    public class TimeoffRequestHRBackgroundService : BackgroundService
     {
         private IConnection _connection;
         private IModel _channel;
         private readonly IEmailSender _emailSender;
-        private readonly ILogger<TimeoffRequestEmailBackgroundService> _logger;
+        private readonly ILogger<TimeoffRequestHRBackgroundService> _logger;
 
-        public TimeoffRequestEmailBackgroundService(IEmailSender emailSender, ILogger<TimeoffRequestEmailBackgroundService> logger)
+        public TimeoffRequestHRBackgroundService(IEmailSender emailSender, ILogger<TimeoffRequestHRBackgroundService> logger)
         {
             var factory = new ConnectionFactory() { HostName = "localhost" };
             _connection = factory.CreateConnection();
@@ -31,7 +31,7 @@ namespace TimeCraft.EmailSender.Workers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _channel.QueueDeclare("timeoff-request", exclusive: false, durable: true, autoDelete: false, arguments: null);
+            _channel.QueueDeclare("timeoff-hr", exclusive: false, durable: true, autoDelete: false, arguments: null);
 
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (model, args) =>
@@ -41,12 +41,12 @@ namespace TimeCraft.EmailSender.Workers
 
                 var body = args.Body;
                 var message = Encoding.UTF8.GetString(body.ToArray());
-                var data = JsonConvert.DeserializeObject<TimeoffRequestDto>(message);
+                var data = JsonConvert.DeserializeObject<TimeoffRequestHRDto>(message);
 
                 SendEmail(data).GetAwaiter().GetResult();
             };
 
-            _channel.BasicConsume(queue: "timeoff-request",
+            _channel.BasicConsume(queue: "timeoff-hr",
                                   autoAck: true,
                                   consumer: consumer);
 
@@ -56,7 +56,7 @@ namespace TimeCraft.EmailSender.Workers
             }
         }
 
-        private async Task SendEmail(TimeoffRequestDto data)
+        private async Task SendEmail(TimeoffRequestHRDto data)
         {
             var pathToFile = "Templates/timeoffRequest.html";
 
@@ -80,9 +80,8 @@ namespace TimeCraft.EmailSender.Workers
             try
             {
                 _logger.LogInformation("Sending 'Timeoff request' email!");
-
                 // Todo: send to HR department
-                await _emailSender.SendEmailAsync("jetonsllamniku@gmail.com", "Timeoff request", content);
+                await _emailSender.SendEmailAsync("jetonsllamniku@gmail.com", "New timeoff request submitted!", content);
             }
             catch (Exception ex)
             {

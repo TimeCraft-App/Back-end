@@ -1,14 +1,12 @@
-﻿using System;
-
-namespace TimeCraft.EmailSender.Dtos
+﻿namespace TimeCraft.Core.Dtos
 {
-    public class TimeoffRequestDto
+    internal class TimeoffRequestHRDto
     {
         public string UserFirstName { get; set; }
 
         public string UserLastName { get; set; }
 
-        public string Type { get; set; } 
+        public string Type { get; set; }
 
         public DateTime StartDate { get; set; }
 
