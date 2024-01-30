@@ -99,41 +99,6 @@ namespace TimeCraft.Core.Services.EmployeeService
             await _unitOfWork.CompleteAsync();
         }
 
-        public void SendEmailTest(string email, string info)
-        {
-        }
-
-        public void SendEmailTest2(string email, string info)
-        {
-            PublishRabbit2(email, info);
-        }
-
        
-        /// <summary>
-        /// Publishes the event to the "timeoff-request" queue when a new timeoff-request is made
-        /// </summary>
-        /// <param name="rabbitData"></param>
-        public void PublishRabbit2(string email, string info)
-        {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: "timeoff-request-status",
-                                     durable: true,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
-
-                var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { email, info }));
-
-                channel.BasicPublish(exchange: "",
-                                     routingKey: "timeoff-request-status",
-                                     basicProperties: null,
-                                     body: body);
-
-                _logger.LogInformation($"{nameof(Employee)} - Data for timeoff-request-status is published to the rabbit!");
-            }
-        }
     }
 }

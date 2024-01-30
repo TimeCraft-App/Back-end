@@ -22,6 +22,7 @@ services.AddSwaggerGen();
 services.AddHostedService<TimeoffRequestUserBackgroundService>();
 services.AddHostedService<TimeoffRequestHRBackgroundService>();
 services.AddHostedService<WelcomeUserBackgroundService>();
+services.AddHostedService<TimeoffStatusRequestEmailBackgroundService>();
 
 #region [Serilog]
 var logger = new LoggerConfiguration()
