@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Text;
 using TimeCraft.Core.Dtos;
+using TimeCraft.Core.Services.QueuedEmailService;
 using TimeCraft.Core.Services.TimeoffBalanceService;
 using TimeCraft.Domain.Dtos.LeaveManagerDtos;
+using TimeCraft.Domain.Dtos.QueuedEmailDtos;
 using TimeCraft.Domain.Entities;
 using TimeCraft.Domain.Enums;
 using TimeCraft.Infrastructure.Persistence.UnitOfWork;
@@ -22,13 +22,15 @@ namespace TimeCraft.Core.Services.LeaveManager
         private readonly IMapper _mapper;
         private readonly ILogger<LeaveManagerService> _logger;
         private readonly ITimeoffBalanceService<TimeoffBalance> _timeoffBalanceService;
+        private readonly IQueuedEmailService<QueuedEmail> _queuedEmailService;
 
-        public LeaveManagerService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<LeaveManagerService> logger, ITimeoffBalanceService<TimeoffBalance> timeoffBalanceService)
+        public LeaveManagerService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<LeaveManagerService> logger, ITimeoffBalanceService<TimeoffBalance> timeoffBalanceService, IQueuedEmailService<QueuedEmail> queuedEmailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _timeoffBalanceService = timeoffBalanceService;
+            _queuedEmailService = queuedEmailService;
         }
 
         public async Task<bool> ApplyForTimeoffRequest(string userId, TimeoffRequestApplicationDto application)
@@ -64,10 +66,10 @@ namespace TimeCraft.Core.Services.LeaveManager
             await _unitOfWork.CompleteAsync();
 
             // Send email to user to notify that the application was succesful
-            PublishTimeoffRequestForUser(user.FirstName, user.LastName, user.Email, application.StartDate, application.EndDate);
+            await PublishTimeoffRequestForUser(user.FirstName, user.LastName, user.Email, application.StartDate, application.EndDate);
 
             // Send email to HR to notify that a new timeoff request was made 
-            PublishTimeoffRequestForHR(user.FirstName, user.LastName, user.Email, timeoffRequest.Type, application.StartDate, application.EndDate, timeoffRequest.Comment);
+            await PublishTimeoffRequestForHR(user.FirstName, user.LastName, user.Email, timeoffRequest.Type, application.StartDate, application.EndDate, timeoffRequest.Comment);
 
             return true;
         }
@@ -109,8 +111,8 @@ namespace TimeCraft.Core.Services.LeaveManager
             if (approve)
             {
                 Enum.TryParse<TimeoffType>(timeoffRequest.Type, out var timeoffType);
-               
-                var timeoffDays = (timeoffRequest.EndDate - timeoffRequest.StartDate).Days;        
+
+                var timeoffDays = (timeoffRequest.EndDate - timeoffRequest.StartDate).Days;
 
                 await _timeoffBalanceService.ChangeBalance(timeoffRequest.EmployeeId, -timeoffDays, timeoffType);
             }
@@ -131,17 +133,27 @@ namespace TimeCraft.Core.Services.LeaveManager
                 ToStatus = timeoffRequest.Status,
             };
 
-            PublishTimeoffRequestStatus(data); // Send timeoff request status changed email
+            await PublishTimeoffRequestStatus(data); // Send timeoff request status changed email
         }
 
         /// <summary>
         /// Publishes the event to the "timeoff-request" queue when a new timeoff-request is made
         /// </summary>
-        private void PublishTimeoffRequestForUser(string name, string lastName, string email, DateTime startDate, DateTime endDate)
+        private async Task PublishTimeoffRequestForUser(string name, string lastName, string email, DateTime startDate, DateTime endDate)
         {
             var info = $"Hello, {name} {lastName}! \n" +
                 $" The application for timeoffRequest for dates {startDate.ToString("dd/MM/yyyy")}-{endDate.ToString("dd/MM/yyyy")} \n" +
                 $" has been <b>submitted successfully</b>! ";
+
+            var emailToQueue = new QueuedEmailCreateDto
+            {
+                RecipientEmail = email,
+                Subject = "Timeoff request for user",
+                Body = info,
+            };
+
+            await _queuedEmailService.Create(_mapper.Map<QueuedEmail>(emailToQueue));
+
             var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
@@ -166,7 +178,7 @@ namespace TimeCraft.Core.Services.LeaveManager
         /// <summary>
         /// Publishes the event to the "timeoff-request" queue when a new timeoff-request is made
         /// </summary>
-        private void PublishTimeoffRequestForHR(string name, string lastName, string email, string type, DateTime startDate, DateTime endDate, string comment)
+        private async Task PublishTimeoffRequestForHR(string name, string lastName, string email, string type, DateTime startDate, DateTime endDate, string comment)
         {
             var data = new TimeoffRequestHRDto
             {
@@ -177,6 +189,15 @@ namespace TimeCraft.Core.Services.LeaveManager
                 EndDate = endDate,
                 Comment = comment
             };
+
+            var emailToQueue = new QueuedEmailCreateDto
+            {
+                RecipientEmail = email,
+                Subject = "Timeoff request for HR",
+                Body = ":TimeoffRequestHRTemplate",
+            };
+
+            await _queuedEmailService.Create(_mapper.Map<QueuedEmail>(emailToQueue));
 
             var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
@@ -204,8 +225,18 @@ namespace TimeCraft.Core.Services.LeaveManager
         /// Publishes the event to the "timeoff-request" when the timeoff request status is changed
         /// </summary>
         /// <param name="rabbitData"></param>
-        private void PublishTimeoffRequestStatus(TimeoffRequestStatusDto data)
+        private async Task PublishTimeoffRequestStatus(TimeoffRequestStatusDto data)
         {
+            var emailToQueue = new QueuedEmailCreateDto
+            {
+                // Todo: recipient for HR department!
+                RecipientEmail = "albionpaqarizi1@gmail.com",
+                Subject = "Timeoff request status change",
+                Body = ":TimeoffRequest status changed",
+            };
+
+            await _queuedEmailService.Create(_mapper.Map<QueuedEmail>(emailToQueue));
+
             var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())

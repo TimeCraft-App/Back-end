@@ -6,7 +6,7 @@ using TimeCraft.Domain.Entities;
 
 namespace TimeCraft.Api.Controllers
 {
-    public class SalaryController : Controller
+    public class SalaryController : BaseController
     {
         private readonly ISalaryService<Salary> _salaryService;
         private readonly ILogger<SalaryController> _logger;

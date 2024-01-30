@@ -9,7 +9,7 @@ using TimeCraft.Domain.Entities;
 namespace TimeCraft.Api.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public class PositionController : Controller
+    public class PositionController : BaseController
     {
         private readonly IPositionService<Position> _positionService;
         private readonly ILogger<PositionController> _logger;

@@ -8,7 +8,7 @@ using TimeCraft.Infrastructure.Constants;
 
 namespace TimeCraft.Api.Controllers
 {
-    public class TimeoffBalanceController : Controller
+    public class TimeoffBalanceController : BaseController
     {
         private readonly ITimeoffBalanceService<TimeoffBalance> _timeoffBalanceService;
         private readonly ILogger<TimeoffBalanceController> _logger;
