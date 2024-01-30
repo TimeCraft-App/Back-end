@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
 using TimeCraft.Core.Dtos;
+using TimeCraft.Core.Services.TimeoffBalanceService;
 using TimeCraft.Domain.Dtos.LeaveManagerDtos;
 using TimeCraft.Domain.Entities;
 using TimeCraft.Domain.Enums;
@@ -20,12 +21,14 @@ namespace TimeCraft.Core.Services.LeaveManager
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<LeaveManagerService> _logger;
+        private readonly ITimeoffBalanceService<TimeoffBalance> _timeoffBalanceService;
 
-        public LeaveManagerService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<LeaveManagerService> logger)
+        public LeaveManagerService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<LeaveManagerService> logger, ITimeoffBalanceService<TimeoffBalance> timeoffBalanceService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _timeoffBalanceService = timeoffBalanceService;
         }
 
         public async Task<bool> ApplyForTimeoffRequest(string userId, TimeoffRequestApplicationDto application)
@@ -38,7 +41,22 @@ namespace TimeCraft.Core.Services.LeaveManager
                 return false;
             }
 
-            application.EmployeeId = employee?.Id;
+            application.EmployeeId = employee.Id;
+
+            var typeIsCorrect = Enum.TryParse<TimeoffType>(application.Type, out var timeoffType);
+            if (!typeIsCorrect)
+            {
+                throw new Exception("The timeoff type isn't correct");
+            }
+
+            var timeoffDays = (application.EndDate - application.StartDate).Days;
+
+            var employeeBalance = _timeoffBalanceService.SearchTimeoffBalances(application.EmployeeId ?? 0).FirstOrDefault();
+
+            if (ExceedsBalance(timeoffType, employeeBalance, timeoffDays))
+            {
+                throw new Exception("You don't have enough balance!");
+            }
 
             var timeoffRequest = _mapper.Map<TimeoffRequest>(application);
 
@@ -69,13 +87,14 @@ namespace TimeCraft.Core.Services.LeaveManager
             var timeoffRequest = await _unitOfWork.Repository<TimeoffRequest>().GetById(x => x.Id == id)
                                                   .Include(x => x.Employee)
                                                   .ThenInclude(x => x.User).FirstOrDefaultAsync();
-            
+
             if (timeoffRequest is null)
             {
                 throw new NullReferenceException("The timeoff request doesn't exist!");
             }
 
-            if (approve && timeoffRequest.Status == TimeoffRequestStatusType.Approved.ToString()) {
+            if (approve && timeoffRequest.Status == TimeoffRequestStatusType.Approved.ToString())
+            {
                 throw new Exception("The timeoff is already approved!");
             }
 
@@ -85,14 +104,25 @@ namespace TimeCraft.Core.Services.LeaveManager
             }
 
             string previousStatus = timeoffRequest.Status;
-            
+
+            // If approved decrease the balance for that employee
+            if (approve)
+            {
+                Enum.TryParse<TimeoffType>(timeoffRequest.Type, out var timeoffType);
+               
+                var timeoffDays = (timeoffRequest.EndDate - timeoffRequest.StartDate).Days;        
+
+                await _timeoffBalanceService.ChangeBalance(timeoffRequest.EmployeeId, -timeoffDays, timeoffType);
+            }
+
             timeoffRequest.Status = approve ? TimeoffRequestStatusType.Approved.ToString() : TimeoffRequestStatusType.Denied.ToString();
             timeoffRequest.UpdatedOn = DateTime.Now;
 
             _unitOfWork.Repository<TimeoffRequest>().Update(timeoffRequest);
             await _unitOfWork.CompleteAsync();
 
-            var data = new TimeoffRequestStatusDto {
+            var data = new TimeoffRequestStatusDto
+            {
                 UserFirstName = timeoffRequest.Employee.User.FirstName,
                 UserLastName = timeoffRequest.Employee.User.LastName,
                 Type = timeoffRequest.Type,
@@ -195,6 +225,32 @@ namespace TimeCraft.Core.Services.LeaveManager
 
                 _logger.LogInformation($"{nameof(Employee)} - Data for timeoff-request-status is published to the rabbit!");
             }
+        }
+
+        private bool ExceedsBalance(TimeoffType timeoffType, TimeoffBalance employeeBalance, int timeoffDays)
+        {
+            switch (timeoffType)
+            {
+                case TimeoffType.Vacation:
+                    if (timeoffDays > employeeBalance.VacationDays)
+                        return true;
+                    break;
+                case TimeoffType.Sick:
+                    if (timeoffDays > employeeBalance.SickDays)
+                        return true;
+                    break;
+                case TimeoffType.Personal:
+                    if (timeoffDays > employeeBalance.PersonalDays)
+                        return true;
+                    break;
+                case TimeoffType.Other:
+                    if (timeoffDays > employeeBalance.OtherTimeOffDays)
+                        return true;
+                    break;
+                default:
+                    throw new Exception("The given type balance doesn't exist!");
+            }
+            return false;
         }
 
 

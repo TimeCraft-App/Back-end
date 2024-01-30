@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using RabbitMQ.Client;
-using System.Text;
 using TimeCraft.Domain.Entities;
 using TimeCraft.Infrastructure.Constants;
 using TimeCraft.Infrastructure.Persistence.UnitOfWork;
@@ -12,7 +9,7 @@ namespace TimeCraft.Core.Services.EmployeeService
 {
     public class EmployeeService : IEmployeeService<Employee>
     {
-        private readonly IMapper _mapper; 
+        private readonly IMapper _mapper;
         private readonly ILogger<EmployeeService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -54,7 +51,10 @@ namespace TimeCraft.Core.Services.EmployeeService
         {
             _unitOfWork.Repository<Employee>().Create(entityToCreate);
             await _unitOfWork.CompleteAsync();
-            
+
+
+            await CreateDefaultTimeBalance(entityToCreate.Id);
+
             return entityToCreate.Id;
         }
 
@@ -69,7 +69,7 @@ namespace TimeCraft.Core.Services.EmployeeService
             existingEmployee.UserId = entityToUpdate.UserId;
             existingEmployee.SalaryId = entityToUpdate.SalaryId;
             existingEmployee.PositionId = entityToUpdate.PositionId;
-          
+
             existingEmployee.UpdatedOn = DateTime.UtcNow;
 
             _unitOfWork.Repository<Employee>().Update(existingEmployee);
@@ -99,6 +99,21 @@ namespace TimeCraft.Core.Services.EmployeeService
             await _unitOfWork.CompleteAsync();
         }
 
-       
+
+        // Adds the default time balance for new employees
+        private async Task CreateDefaultTimeBalance(int employeeId)
+        {
+            var timeoffBalance = new TimeoffBalance
+            {
+                EmployeeId = employeeId, 
+                VacationDays = 20, // 20 days on a year
+                SickDays = 10, // 10 days on a year
+                PersonalDays = 5, 
+                OtherTimeOffDays = 5
+            };
+
+            _unitOfWork.Repository<TimeoffBalance>().Create(timeoffBalance);
+            await _unitOfWork.CompleteAsync();
+        }
     }
 }
