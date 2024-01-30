@@ -3,6 +3,7 @@ using TimeCraft.Domain.Dtos.EmployeeDtos;
 using TimeCraft.Domain.Dtos.LeaveManagerDtos;
 using TimeCraft.Domain.Dtos.PositionDtos;
 using TimeCraft.Domain.Dtos.SalaryDtos;
+using TimeCraft.Domain.Dtos.TimeoffBalanceDtos;
 using TimeCraft.Domain.Entities;
 
 namespace TimeCraft.Infrastructure.Configurations
@@ -28,6 +29,9 @@ namespace TimeCraft.Infrastructure.Configurations
 
             CreateMap<SalaryCreateDto, Salary>().ReverseMap();
             CreateMap<SalaryUpdateDto, Salary>().ReverseMap();
+
+            CreateMap<TimeoffBalanceCreateDto, TimeoffBalance>().ReverseMap();
+            CreateMap<TimeoffBalanceUpdateDto, TimeoffBalance>().ReverseMap();
 
             CreateMap<TimeoffRequest, TimeoffRequestApplicationDto>().ReverseMap(); 
         }

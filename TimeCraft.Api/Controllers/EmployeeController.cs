@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net.NetworkInformation;
-using System.Text;
 using TimeCraft.Core.Services.EmployeeService;
 using TimeCraft.Domain.Dtos.EmployeeDtos;
 using TimeCraft.Domain.Entities;
