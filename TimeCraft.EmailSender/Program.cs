@@ -19,7 +19,8 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-services.AddHostedService<TimeoffRequestEmailBackgroundService>();
+services.AddHostedService<TimeoffRequestUserBackgroundService>();
+services.AddHostedService<TimeoffRequestHRBackgroundService>();
 services.AddHostedService<WelcomeUserBackgroundService>();
 
 #region [Serilog]
