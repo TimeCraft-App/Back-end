@@ -14,6 +14,8 @@ namespace TimeCraft.Core.Services.TimeoffBalanceService
         private readonly ILogger<TimeoffBalanceService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
+        private const int TOTAL_TIMEOFF_DAYS = 40; // 20 vacation, 10 sick, 5 personal and 5 others
+
         public TimeoffBalanceService(IMapper mapper, ILogger<TimeoffBalanceService> logger, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
@@ -153,6 +155,21 @@ namespace TimeCraft.Core.Services.TimeoffBalanceService
                 default:
                     throw new Exception("The given type balance doesn't exist!");
             }
+        }
+
+        public async Task<int> CalculateUsedDays(int employeeId) {
+            var timeoffBalance = await _unitOfWork.Repository<TimeoffBalance>().GetByCondition(x => x.EmployeeId == employeeId).FirstOrDefaultAsync();
+
+            if (timeoffBalance is null)
+            {
+                throw new NullReferenceException("There is no timeoffbalance for the given employee id!");
+            }
+
+            var totalLeftDays = timeoffBalance.VacationDays + timeoffBalance.SickDays + timeoffBalance.PersonalDays + timeoffBalance.OtherTimeOffDays;
+
+            var usedDays = TOTAL_TIMEOFF_DAYS - totalLeftDays;
+
+            return usedDays;
         }
     }
 }

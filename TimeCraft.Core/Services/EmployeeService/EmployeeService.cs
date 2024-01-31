@@ -52,7 +52,6 @@ namespace TimeCraft.Core.Services.EmployeeService
             _unitOfWork.Repository<Employee>().Create(entityToCreate);
             await _unitOfWork.CompleteAsync();
 
-
             await CreateDefaultTimeBalance(entityToCreate.Id);
 
             return entityToCreate.Id;

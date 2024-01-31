@@ -82,7 +82,7 @@ namespace TimeCraft.EmailSender.Workers
                 _logger.LogInformation("Sending 'Timeoff request status' email!");
 
                 // Todo: send to HR department
-                await _emailSender.SendEmailAsync("jetonsllamniku@gmail.com", "Timeoff request status changed", content);
+                await _emailSender.SendEmailAsync(data.Email, "Timeoff request status changed", content);
             }
             catch (Exception ex)
             {

@@ -13,5 +13,8 @@
         public string ToStatus { get; set; }
 
         public string Comment { get; set; }
+
+        public string Email { get; set; }
+
     }
 }
