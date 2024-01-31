@@ -24,7 +24,7 @@ services.AddHostedService<TimeoffRequestHRBackgroundService>();
 services.AddHostedService<WelcomeUserBackgroundService>();
 services.AddHostedService<TimeoffStatusRequestEmailBackgroundService>();
 
-#region [Serilog]
+/*#region [Serilog]
 var logger = new LoggerConfiguration()
         .ReadFrom.Configuration(builder.Configuration)
         .Enrich.FromLogContext()
@@ -32,7 +32,7 @@ var logger = new LoggerConfiguration()
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
-#endregion
+#endregion*/
 
 #region EmailSenders 
 services.AddEmailSenders(builder.Configuration);
