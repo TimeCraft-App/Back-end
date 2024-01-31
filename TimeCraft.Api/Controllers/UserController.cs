@@ -38,7 +38,7 @@ namespace TimeCraft.Api.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User, Admin")]
         [HttpGet("Users")]
-        public async Task<IActionResult> GetUsers(int page, int pageSize)
+        public async Task<IActionResult> GetUsers(int page = 1, int pageSize = 10)
         {
             var users = await _userService.GetUsers(page, pageSize);
             return Ok(users);
