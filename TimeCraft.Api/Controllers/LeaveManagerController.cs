@@ -136,6 +136,11 @@ namespace TimeCraft.Api.Controllers
                 SickDaysLeft = _timeoffBalanceService.GetBalance(employeeId, TimeoffType.Sick); 
 
                 var lastTimeoff = _unitOfWork.Repository<TimeoffRequest>().GetByCondition(x => x.EmployeeId == employeeId && x.Status == "Approved").FirstOrDefault();
+
+                if (lastTimeoff is null)
+                {
+                    throw new Exception("The employee hasn't used any timeoff day!");
+                }
                 if (lastTimeoff.StartDate <= DateTime.Now && lastTimeoff.EndDate >= DateTime.Now)
                 {
                     if (Enum.TryParse<TimeoffType>(lastTimeoff.Type, out var timeoffType))

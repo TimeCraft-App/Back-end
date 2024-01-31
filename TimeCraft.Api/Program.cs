@@ -80,7 +80,7 @@ services.AddSwaggerGen(c =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
+                Reference = new OpenApiReference    
                 {
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
@@ -93,13 +93,13 @@ services.AddSwaggerGen(c =>
 
 
 #region [Serilog]
-var logger = new LoggerConfiguration()
-        .ReadFrom.Configuration(builder.Configuration)
-        .Enrich.FromLogContext()
-        .CreateLogger();
+//var logger = new LoggerConfiguration()
+//        .ReadFrom.Configuration(builder.Configuration)
+//        .Enrich.FromLogContext()
+//        .CreateLogger();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
+//builder.Logging.ClearProviders();
+//builder.Logging.AddSerilog(logger);
 #endregion
 
 #region [Mapper]
