@@ -11,5 +11,7 @@ namespace TimeCraft.Core.Services.TimeoffBalanceService
         Task ChangeBalance(int employeeId, int quantity, TimeoffType type);
 
         int GetBalance(int employeeId, TimeoffType type);
+
+        Task<int> CalculateUsedDays(int employeeId);
     }
 }

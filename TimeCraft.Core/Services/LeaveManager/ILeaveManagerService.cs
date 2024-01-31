@@ -1,4 +1,6 @@
 ﻿using TimeCraft.Domain.Dtos.LeaveManagerDtos;
+using TimeCraft.Domain.Entities;
+using TimeCraft.Domain.Enums;
 
 namespace TimeCraft.Core.Services.LeaveManager
 {
@@ -9,5 +11,7 @@ namespace TimeCraft.Core.Services.LeaveManager
         Task ApproveTimeoffRequest(int id);
 
         Task RejectTimeoffRequest(int id);
+
+        bool ExceedsBalance(TimeoffType timeoffType, TimeoffBalance employeeBalance, int timeoffDays);
     }
 }

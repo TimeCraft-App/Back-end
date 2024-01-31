@@ -65,7 +65,7 @@ namespace TimeCraft.Core.Services.LeaveManager
             _unitOfWork.Repository<TimeoffRequest>().Create(timeoffRequest);
             await _unitOfWork.CompleteAsync();
 
-            // Send email to user to notify that the application was succesful
+            // Send email to user to notify that the application was successful
             await PublishTimeoffRequestForUser(user.FirstName, user.LastName, user.Email, application.StartDate, application.EndDate);
 
             // Send email to HR to notify that a new timeoff request was made 
@@ -131,6 +131,7 @@ namespace TimeCraft.Core.Services.LeaveManager
                 Comment = timeoffRequest.Comment,
                 FromStatus = previousStatus,
                 ToStatus = timeoffRequest.Status,
+                Email = timeoffRequest.Employee.User.Email
             };
 
             await PublishTimeoffRequestStatus(data); // Send timeoff request status changed email
@@ -258,7 +259,7 @@ namespace TimeCraft.Core.Services.LeaveManager
             }
         }
 
-        private bool ExceedsBalance(TimeoffType timeoffType, TimeoffBalance employeeBalance, int timeoffDays)
+        public bool ExceedsBalance(TimeoffType timeoffType, TimeoffBalance employeeBalance, int timeoffDays)
         {
             switch (timeoffType)
             {

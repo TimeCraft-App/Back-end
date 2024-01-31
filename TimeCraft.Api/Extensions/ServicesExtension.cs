@@ -4,6 +4,8 @@ using TimeCraft.Core.Services.PositionService;
 using TimeCraft.Core.Services.QueuedEmailService;
 using TimeCraft.Core.Services.SalaryService;
 using TimeCraft.Core.Services.TimeoffBalanceService;
+using TimeCraft.Core.Services.TimeTracker;
+using TimeCraft.Core.Services.TimeWorkedService;
 using TimeCraft.Core.Services.UserService;
 using TimeCraft.Domain.Entities;
 
@@ -20,6 +22,8 @@ namespace TimeCraft.Api.Extensions
             services.AddTransient<ILeaveManagerService, LeaveManagerService>();
             services.AddTransient<ITimeoffBalanceService<TimeoffBalance>, TimeoffBalanceService>(); 
             services.AddTransient<IQueuedEmailService<QueuedEmail>, QueuedEmailService>();  
+            services.AddTransient<ITimeWorkedService<TimeWorked>, TimeWorkedService>();  
+            services.AddTransient<ITimeTrackerService, TimeTrackerService>();  
         }
     }
 }
